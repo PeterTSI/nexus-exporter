@@ -27,6 +27,14 @@ RUN cd /usr/bin \
 RUN pip install prometheus-client==0.0.14
 
 EXPOSE 9184
-COPY nexus_exporter.py /nexus_exporter.py
+WORKDIR /opt
+WORKDIR nexus
+COPY nexus_exporter.py nexus_exporter.py
 
-ENTRYPOINT ["/nexus_exporter.py"]
+RUN addgroup -g 1000 -S nexus && adduser -u 1000 -S nexus -G nexus \
+    && chown -R nexus:nexus /opt/nexus \
+    && chmod a+x /opt/nexus/nexus_exporter.py
+
+USER nexus
+
+ENTRYPOINT ["/opt/nexus/nexus_exporter.py"]
